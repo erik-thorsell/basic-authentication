@@ -1,0 +1,8 @@
+{
+    "class": {
+        "name": "The name of the class is required."
+    },
+    "lesson": {
+        "name": "The name of the lesson is required."
+    }
+}
