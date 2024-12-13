@@ -1,6 +1,6 @@
 import sqlite3
 
-database_path = '../database.db'
+database_path = 'database.db'
 
 def get_db_connection():
     """Returns a connection aswell as a cursor to the SQLite database."""
@@ -18,28 +18,29 @@ def init_db():
         session_id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         code INT,
-        classes TEXT DEFAULT '{}' NOT NULL
+        classes TEXT DEFAULT '[]' NOT NULL
     )
     ''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS classes (
-            id INT PRIMARY KEY,
+            id TEXT PRIMARY KEY,
+            teacher TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
-            members TEXT DEFAULT '{}' NOT NULL,
-            administrators TEXT DEFAULT '{}' NOT NULL,
-            lessons TEXT DEFAULT '{}' NOT NULL
+            students TEXT DEFAULT '[]' NOT NULL,
+            lessons TEXT DEFAULT '[]' NOT NULL
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS lessons (
             id INT PRIMARY KEY,
+            class TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT DEFAULT '' NOT NULL,
             settings TEXT DEFAULT '{}' NOT NULL,
-            content TEXT DEFAULT '{}' NOT NULL
+            content TEXT DEFAULT '[]' NOT NULL
         )
     ''')
 

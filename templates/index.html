@@ -13,6 +13,7 @@
     </ul>
 
     <button id = "btn">Create</button>
+    <button id = "getClass">GetClass</button>
     <script>
         document.getElementById('btn').addEventListener('click', function(){
             fetch(window.location.href + 'create', {
@@ -37,6 +38,26 @@
                 console.error(error);
             });
             
+        })
+
+        document.getElementById('getClass').addEventListener('click', function(){
+            fetch(window.location.href + 'getClass?id='+ encodeURIComponent("eMTNNI2ALtPSsX1SkaNOncNCDhjRZl2MxpgLTOb2WCw="), {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error: ' + response.status);
+                }
+            })
+            .then(data => {
+                // Open a new tab and display the response data
+                window.open().document.write(JSON.stringify(data));
+            })
+            .catch(error => {
+                console.error(error);
+            });
         })
     </script>
 </body>
