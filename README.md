@@ -10,7 +10,7 @@
 ## run the project locally
 clone the repository
 ```bash
-git clone
+git clone https://github.com/erik-thorsell/basic-authentication
 ```
 install the dependencies
 ```bash
