@@ -1,11 +1,11 @@
 # BRAGLOSOR
 
 ## goal of the project
-- to create a simple and easy way to learn words, phrases and sentences in a foreign language
+to create a simple and easy way to learn words, phrases and sentences in a foreign language
 
 ## framework
-- flask
-- sqlite3
+- flask (backend server)
+- sqlite3 (database)
 
 ## run the project locally
 clone the repository
