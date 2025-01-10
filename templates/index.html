@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Start</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <ul>
@@ -11,10 +12,24 @@
             <li>{{ key }}: {{ value }}</li>
         {% endfor %}
     </ul>
-
+    <div id="classTemplate" class="classes" style="display: none;">
+        <h1>Name Goes Here</h1>
+    </div>
     <button id = "btn">Create</button>
-    <button id = "getClass">GetClass</button>
     <script>
+        function spawnClass(name, id) {
+            // clone the classtemplate
+            const newClass = document.getElementById('classTemplate').cloneNode(true);
+            newClass.style.display = 'flex';
+            newClass.setAttribute('id', id)
+            newClass.addEventListener('click', function() {
+                // replace the window url
+                window.location.href += 'getClass?id=' + encodeURIComponent(id);
+            })
+            newClass.querySelector('h1').textContent = name;
+            document.body.appendChild(newClass);
+        }
+
         document.getElementById('btn').addEventListener('click', function(){
             fetch(window.location.href + 'create', {
                 method: 'POST',
@@ -27,21 +42,19 @@
                 if (response.ok) {
                     return response.json();
                 } else {
-                    throw new Error('Error: ' + response.status);
+                    throw new Error('Error : ' + response.status);
                 }
             })
             .then(data => {
-                // Open a new tab and display the response data
-                window.open().document.write(JSON.stringify(data));
+                spawnClass(data.name, data.id);
             })
             .catch(error => {
                 console.error(error);
             });
             
         })
-
-        document.getElementById('getClass').addEventListener('click', function(){
-            fetch(window.location.href + 'getClass?id='+ encodeURIComponent("eMTNNI2ALtPSsX1SkaNOncNCDhjRZl2MxpgLTOb2WCw="), {
+        function getClass(id) {
+            fetch(window.location.href + 'getClass?id='+ encodeURIComponent(id), {
                 method: 'GET'
             })
             .then(response => {
@@ -52,13 +65,18 @@
                 }
             })
             .then(data => {
-                // Open a new tab and display the response data
-                window.open().document.write(JSON.stringify(data));
+                spawnClass(data.name, data.id);
             })
             .catch(error => {
                 console.error(error);
             });
-        })
+        }
+
+        // Get session items and alert them
+        const sessionItems = {{ session|tojson|safe }};
+        sessionItems.classes.forEach(id => {
+            getClass(id);
+        });
     </script>
 </body>
 </html>

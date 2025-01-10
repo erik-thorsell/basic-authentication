@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function spawnLesson(name, id) {
+            // template for a lesson
+            const newLesson = document.createElement('div');
+            newLesson.addEventListener('click', function() {
+                // replace the window url
+                window.location.href += 'getLesson?id=' + encodeURIComponent(id);
+            })
+        }
+
+        function createLesson() {
+            window.location.href += '?createLesson=true';
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
