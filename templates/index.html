@@ -3,40 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start</title>
+    <title>HOME - GLOSGREJEN</title>
+    <!-- link to the stylesheets, this is flask stuff -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
-    <ul>
-        {% for key, value in session.items() %}
-            <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
-    <div id="classTemplate" class="classes" style="display: none;">
+    <h1>GLOSGREJEN</h1> 
+    <h2>CLASSES</h2>
+    <p id="helpText">YOU ARE NOT IN ANY CLASSES</p> <!-- helps out a little to know what you're doing -->
+    <div id="classTemplate" class="classes" style="display: none;"> <!-- template for a class -->
         <h1>Name Goes Here</h1>
     </div>
-    <button id = "btn">Create</button>
+
+    <button onclick="show()" id="create" class="button">CREATE A NEW CLASS</button> <!-- spawns a new class -->
+    <div id="bg"> <!-- background for the create class -->
+        <button id="back" onclick="back()">BACK</button>
+        <input type="text" id="classInput" placeholder="Class Name">
+        <button id="classButton" onclick="createClassButton()">CREATE CLASS</button> <!-- creates the class -->
+    </div>
     <script>
-        function spawnClass(name, id) {
+        function spawnClass(name, id) { // spawns a new class div
+            document.getElementById('helpText').style.display = 'none'; // remove the "you are not in any classes" text
             // clone the classtemplate
             const newClass = document.getElementById('classTemplate').cloneNode(true);
             newClass.style.display = 'flex';
-            newClass.setAttribute('id', id)
+            newClass.setAttribute('id', id); // set the id of the class
             newClass.addEventListener('click', function() {
-                // replace the window url
-                window.location.href += 'getClass?id=' + encodeURIComponent(id);
+                // replace the window url to the class page
+                window.location.href += 'class?id=' + encodeURIComponent(id);
             })
             newClass.querySelector('h1').textContent = name;
             document.body.appendChild(newClass);
         }
 
-        document.getElementById('btn').addEventListener('click', function(){
+        function createClass(name) { // sends a POST request to the server to create a new class
             fetch(window.location.href + 'create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({'type': 'class', 'name': 'Test'})
+                body: JSON.stringify({'type': 'class', 'name': name})
             })
             .then(response => {
                 if (response.ok) {
@@ -46,14 +53,35 @@
                 }
             })
             .then(data => {
-                spawnClass(data.name, data.id);
+                spawnClass(data.name, data.id); // spawns the new class
             })
             .catch(error => {
                 console.error(error);
             });
-            
-        })
-        function getClass(id) {
+            back(); // goes back to the classes to show the new class along with the others
+        }
+
+        function createClassButton() { // creates a class when the button is clicked
+            const classInput = document.getElementById('classInput'); // get the class name
+            if (classInput.value.trim() === '') { // if the class name is empty return
+                return;
+            }
+            createClass(classInput.value); // create the class with the name
+        }
+
+        const bg = document.getElementById('bg');
+        const classInput = document.getElementById('classInput');
+        function back() { // hides the create class background
+            bg.style.opacity = 0; 
+            bg.style.pointerEvents = 'none';
+        }
+        function show() { // shows the create class background and resets the input
+            classInput.value = '';
+            bg.style.opacity = 1;
+            bg.style.pointerEvents = 'all';
+        }
+
+        function getClass(id) { // fetches the specified class' data from the server
             fetch(window.location.href + 'getClass?id='+ encodeURIComponent(id), {
                 method: 'GET'
             })
@@ -65,17 +93,16 @@
                 }
             })
             .then(data => {
-                spawnClass(data.name, data.id);
+                spawnClass(data.name, data.id); // spawns the class
             })
             .catch(error => {
                 console.error(error);
             });
         }
 
-        // Get session items and alert them
-        const sessionItems = {{ session|tojson|safe }};
-        sessionItems.classes.forEach(id => {
-            getClass(id);
+        const sessionItems = {{ session|tojson|safe }}; // gets the session data from the server, flask sends it as a json object; not actually an error
+        sessionItems.classes.forEach(id => { // for each class in the session
+            getClass(id); // get the class
         });
     </script>
 </body>

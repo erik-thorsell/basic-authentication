@@ -3,23 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        function spawnLesson(name, id) {
-            // template for a lesson
-            const newLesson = document.createElement('div');
-            newLesson.addEventListener('click', function() {
-                // replace the window url
-                window.location.href += 'getLesson?id=' + encodeURIComponent(id);
-            })
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='class.css') }}">
+    <title></title>
+    <script defer>
+        // fetches the lesson data from the server
+        async function getLesson(id) {
+            try { // try to fetch the data by sending a GET request to the server with the class and lesson id
+            const response = await fetch(window.location.origin + '/lesson?class=' + window.location.href.split('=')[1] + '&id=' + encodeURIComponent(id) + "&fetch=true", {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                throw new Error('Error : ' + response.status);
+            }
+            const data = await response.json();
+            return data; // returns the data
+            } catch (error) {
+            console.error(error);
+            }
         }
 
-        function createLesson() {
-            window.location.href += '?createLesson=true';
+        // spawns a new lesson div
+        async function spawnLesson(id) {
+            document.getElementById('helpText').style.display = 'none'; // remove the "you have no lessons" text
+            const data = await getLesson(id); // waits for the lesson data to be fetched
+            console.log(data)
+            // template for a lesson
+            const newLesson = document.createElement('div');
+            newLesson.classList.add('lesson');
+            newLesson.textContent = data.name;
+            newLesson.addEventListener('click', function() { // when the lesson is clicked
+                // replace the window url
+                window.location.href = window.location.origin + '/lesson?class=' + window.location.href.split('=')[1] + '&id=' + encodeURIComponent(id);
+            })
+            document.querySelector('.lessons').appendChild(newLesson);
         }
+
+        // redirects the user to the createLesson page
+        function createLesson() { 
+            window.location.href = 'createLesson?classId=' + encodeURIComponent(window.location.href.split('=')[1]);
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => { // ensures the page is loaded before running the script
+            const sessionItems = {{ session|tojson|safe }}; // gets the session data from the server, flask sends it as a json object; not actually an error
+            document.getElementById("data").innerText = JSON.stringify(sessionItems); // for debugging purposes
+            document.title = sessionItems.name + " - Klass"; // sets the title of the page to the name of the class to clarify where the user is
+            document.getElementById("className").innerText = sessionItems.name; // sets the class name to the name of the class
+            // spawn a lesson div for each lesson in the class
+            sessionItems.lessons.forEach(data => { 
+                spawnLesson(data);
+            });
+        });
     </script>
 </head>
 <body>
-    
+    <p id="helpText">THIS CLASS DOES NOT HAVE ANY LESSONS</p>
+    <div id="data" style="display: none;"></div>
+    <h1 id="className"></h1>
+    <div class="lessons"></div>
+    <button onclick="createLesson()" id="create" class="button">CREATE A NEW LESSON</button>
+    <button onclick="window.location.href = window.location.origin" id="back" class="button">BACK</button>
 </body>
 </html>

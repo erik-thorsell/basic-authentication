@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lesson.css') }}">
+</head>
+<body>
+    <a href="" id="back" class="button" >BACK</a> <!-- goes back to the class -->
+    <section>
+        <div class="bg" style="pointer-events: none;"> <!-- background for the create class, pointer-events ensures that it doesn't block the answer button -->
+            <p style="pointer-events: none;"></p>
+        </div>
+        <button id="start" onclick="start()">STARTA</button> <!-- starts the lesson -->
+        <p id="question"></p> <!-- question text -->
+        <input type="text" id="answer" placeholder="Answer" style="display: none;"> <!-- answer input -->
+        <button id="submit" class="button" style="display: none;">SVARA</button> <!-- submit button -->
+    </section>
+    <script>
+    const sessionItems = {{ session|tojson|safe }}; // gets the session data from the server, flask sends it as a json object; not actually an error
+    
+    document.title = sessionItems.name + " - Lektion"; // sets the title of the page to the name of the class to clarify where the user is
+
+    const questions = JSON.parse(sessionItems.content); // gets the questions from the session data
+
+    const questionTitle = document.getElementById('question');
+    const answer = document.getElementById('answer');
+    const submit = document.getElementById('submit');
+    const bg = document.querySelector('.bg'); 
+
+    var score = 0; // the score of the user
+    var total = questions.length; // the total amount of questions
+
+    async function fadeOut() { // fades out the correct/answer background
+        bg.style.opacity = 0;
+        setTimeout(() => {
+            bg.style.pointerEvents = 'none';
+        }, 500);
+    }
+    async function fadeIn() { // fades in the correct/answer background
+        bg.style.opacity = 1;
+        bg.style.pointerEvents = 'all';
+    }
+
+    async function customAlert(text) { // displays a correct/incorrect message
+        bg.querySelector('p').textContent = text;
+        fadeIn().then(() => {
+            setTimeout(() => {
+                fadeOut();
+            }, 2000);
+        });
+    }
+
+    async function displayQuestion(swedish, english) { // displays a question, doesn't have to be swedish and english
+        questionTitle.textContent = swedish;
+        answer.value = "";
+        answer.style.display = 'block';
+        submit.style.display = 'block';
+
+
+        
+        await new Promise(resolve => { // waits for the user to submit the answer
+            submit.onclick = resolve;
+            answer.onkeypress = (event) => {
+            if (event.key === 'Enter') {
+                resolve();
+            }
+            };
+        });
+        answer.focus(); // focuses the answer input
+        const userAnswer = answer.value.trim(); // gets the user's answer without whitespace
+        if (userAnswer.toLowerCase().trim() === english.toLowerCase().trim()) { // if the user's answer is correct
+            customAlert("Correct!");  // display correct message
+            score++; // increment the score
+        } else {
+            customAlert("Incorrect! The correct answer was: " + english); // display incorrect message, score doesn't change
+        }
+    }
+    
+    function start() { // starts the lesson
+        document.getElementById('start').style.display = 'none'; // hides the start button
+
+        function question() { // asks a question
+            if (questions.length === 0) { // if there are no more questions
+                answer.style.display = 'none'; // hide the answer input
+                submit.style.display = 'none'; // hide the submit button
+                questionTitle.textContent = "Result: " + score + "/" + total; // display the result
+                fadeIn(); // fade in the result
+                return;
+            }
+
+            // get a random question
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            const randomQuestion = questions[randomIndex]; 
+
+            questions.splice(randomIndex, 1); // remove the question from the questions array
+            displayQuestion(randomQuestion.swedish, randomQuestion.english).then(() => { // display the question
+                setTimeout(() => { // wait for the correct/incorrect message to disappear
+                    question(); 
+                }, 500);
+            });
+        }
+        question(); // start the question loop
+    }
+
+    document.getElementById("back").href = window.location.origin + "/class?id=" + encodeURIComponent(sessionItems.class); // set the back button href
+
+    const p = document.createElement('p');
+    p.textContent = JSON.stringify(sessionItems);
+    document.body.appendChild(p);
+    p.style.display = 'none';
+    start() // start the lesson
+    </script>
+</body>
+</html>

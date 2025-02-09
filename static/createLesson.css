@@ -1,0 +1,28 @@
+label {
+    font-size: 2rem;
+}
+
+input {
+    font: inherit;
+    font-size: 2rem;
+    background-color: transparent;
+    border: none;
+    text-align: start;
+    text-decoration: underline 1px white;
+    color: white;
+    width: 15vw;
+}
+input:focus {
+    outline: none;
+    text-decoration: none;
+}
+
+h1 {
+    margin-right: 1rem;
+    color: lightgray
+}
+#back {
+    position: absolute;
+    bottom: 2vh;
+    right: 2vh;
+}

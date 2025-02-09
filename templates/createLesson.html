@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREATE CLASS - GLOSGREJEN</title>
+    <style>
+        #template { /* to hide the template question */
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='createLesson.css') }}">
+</head>
+<body>
+    <!-- template question -->
+    <div class="question" id="template">
+        <h1>#</h1>
+        <input type="text" required placeholder="word">
+        <input type="text" required placeholder="translation">
+    </div>
+    <p>YOU ARE CREATING A NEW LESSON</p> <!-- helps out a little to know what you're doing -->
+    <form>
+        <!-- lesson name input -->
+        <label for="lesson_name">Lesson Name:</label> 
+        <input type="text" id="lesson_name" name="lesson_name" placeholder="New Lesson"><br>
+    </form>
+    <button onclick="spawnQuestion()" class="button">Add Question</button> <!-- spawns a new question -->
+    <button onclick="submit()" class="button">Submit</button> <!-- submits the lesson -->
+    <button onclick="back()" class="button" id="back">BACK</button> <!-- goes back to the class -->
+
+    <script>
+        function spawnQuestion() {
+            const newQuestion = document.querySelector('.question').cloneNode(true); // clone the template question
+            newQuestion.style.display = 'flex';
+            newQuestion.querySelector('h1').textContent = "#" + (document.querySelector("form").querySelectorAll('.question').length + 1); // set the question number
+            newQuestion.setAttribute('id', ''); // remove the template id
+            document.querySelector("form").appendChild(newQuestion); // append the new question to the questions
+        }
+        spawnQuestion(); // spawn the first question
+
+        function submit(){
+            const questions = document.querySelectorAll('.question'); // get all the questions
+            const lesson_name = document.getElementById('lesson_name').value; // get the lesson name
+            const data = { // create the data object
+                'type': "lesson",
+                'class': decodeURIComponent(new URLSearchParams(window.location.search).get('classId')), // the class id, has to be decoded to work serverside
+                'name': lesson_name,
+                'description': "",
+                'questions': []
+            }
+            questions.forEach(question => { // for each question
+                if (question.id === 'template') { // if the question is the template question return
+                    return;
+                }
+                // if the question is empty return
+                if (question.querySelector('input[type="text"]:nth-child(2)').value === '' || question.querySelector('input[type="text"]:nth-child(3)').value === '') {
+                    return;
+                }
+                
+                // get the word and translation, doesn't have to be swedish and english
+                const swedish = question.querySelector('input[type="text"]:nth-child(2)').value;
+                const english = question.querySelector('input[type="text"]:nth-child(3)').value;
+                data.questions.push({
+                    'swedish': swedish,
+                    'english': english
+                });
+            });
+
+            if (data.questions.length === 0) { // if there are no questions return
+                return;
+            }
+            
+            // send the create request to the server with the data
+            fetch(`${window.location.origin}/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error : ' + response.status);
+                }
+            })
+            .then(data => {
+                back(); // go back to the class
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function back() { // go back to the class
+            window.location.href = window.location.origin + '/class?id=' + new URLSearchParams(window.location.search).get('classId');
+        }
+    </script>
+</body>
+</html>

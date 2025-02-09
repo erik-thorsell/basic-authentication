@@ -1,0 +1,59 @@
+body {
+    background-color: rgb(30, 30, 30);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lessons {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0;
+    border-radius: 5px;
+    border-bottom: 2px solid gray;
+}
+.lesson {
+    width: 30vw;
+    border-top: 2px solid gray;
+    position: relative;
+    padding: 1rem;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .3s;
+    box-sizing: border-box;
+}
+.lesson:hover {
+    background: linear-gradient(90deg, rgb(30,30,30), rgb(48, 48, 48), rgb(30,30,30)); 
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+}
+
+
+
+.button {
+    position: fixed !important;
+}
+#create {
+    bottom: 2vh;
+    right: 2vh;
+}
+#back {
+    bottom: 2vh;
+    left: 2vh;
+}
+
+#className {
+    font-size: 3rem;
+}

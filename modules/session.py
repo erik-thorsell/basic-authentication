@@ -4,33 +4,29 @@ import json
 from modules.database import get_db_connection
 
 
-def _generate_session_id():
-    """Generates a cryptographically secure, random, session ID."""
+def _generate_session_id(): # this function is used to generate a random session ID
     token_bytes = secrets.token_bytes(32)
     return base64.urlsafe_b64encode(token_bytes).decode('utf-8')
 class Session:
-    def __init__(self, session_id=None):
-        """Initializes a new session object."""
+    def __init__(self, session_id=None): # generates a new session ID if none is provided
         self.id = session_id or _generate_session_id()
         self._update()
 
-    def _update(self):
-        """Updates the session object."""
+    def _update(self): # updates the session from the database
         conn, cursor = get_db_connection()
         result = cursor.execute('SELECT * FROM sessions WHERE session_id = ?', (self.id,)).fetchone()
         conn.close()
         if not result:
             return self._create()
             
-        self.username = result['username']
-        self.code = result['code']
-        self.classes = json.loads(result['classes'])
+        self.username = result['username'] # was supposed to be for cosmetic purposes, never implemented
+        self.code = result['code'] # is supposed to be used to handle switching between different sessions, never implemented
+        self.classes = json.loads(result['classes']) # list of classes the user is in
         return self
 
-    def _create(self):
-        """Creates a new session."""
+    def _create(self): # creates a new session in the database
         conn, cursor = get_db_connection()
-        self.username = "user" + str(cursor.execute('SELECT COUNT(*) FROM sessions').fetchone()[0])
+        self.username = "user" + str(cursor.execute('SELECT COUNT(*) FROM sessions').fetchone()[0]) # generate a new username
         cursor.execute('INSERT INTO sessions (session_id, username) VALUES (?, ?)', (self.id, self.username))
         conn.close()
         return self._update()
