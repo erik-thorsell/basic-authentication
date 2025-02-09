@@ -13,10 +13,10 @@
         <div class="bg" style="pointer-events: none;"> <!-- background for the create class, pointer-events ensures that it doesn't block the answer button -->
             <p style="pointer-events: none;"></p>
         </div>
-        <button id="start" onclick="start()">STARTA</button> <!-- starts the lesson -->
-        <p id="question"></p> <!-- question text -->
+        <button id="start" onclick="start()" class="button">START</button> <!-- starts the lesson -->
+        <p id="question" style="text-align: center;"></p> <!-- question text -->
         <input type="text" id="answer" placeholder="Answer" style="display: none;"> <!-- answer input -->
-        <button id="submit" class="button" style="display: none;">SVARA</button> <!-- submit button -->
+        <button id="submit" class="button" style="display: none;">ANSWER</button> <!-- submit button -->
     </section>
     <script>
     const sessionItems = {{ session|tojson|safe }}; // gets the session data from the server, flask sends it as a json object; not actually an error
@@ -86,7 +86,7 @@
             if (questions.length === 0) { // if there are no more questions
                 answer.style.display = 'none'; // hide the answer input
                 submit.style.display = 'none'; // hide the submit button
-                questionTitle.textContent = "Result: " + score + "/" + total; // display the result
+                questionTitle.innerHTML = "Lesson Complete!<br>Result: " + score + "/" + total; // display the result with a newline
                 fadeIn(); // fade in the result
                 return;
             }
@@ -111,7 +111,6 @@
     p.textContent = JSON.stringify(sessionItems);
     document.body.appendChild(p);
     p.style.display = 'none';
-    start() // start the lesson
     </script>
 </body>
 </html>

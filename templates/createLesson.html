@@ -16,17 +16,17 @@
     <!-- template question -->
     <div class="question" id="template">
         <h1>#</h1>
-        <input type="text" required placeholder="word">
-        <input type="text" required placeholder="translation">
+        <input type="text" required placeholder="Enter Word">
+        <input type="text" required placeholder="Enter Translation">
     </div>
     <p>YOU ARE CREATING A NEW LESSON</p> <!-- helps out a little to know what you're doing -->
     <form>
         <!-- lesson name input -->
         <label for="lesson_name">Lesson Name:</label> 
-        <input type="text" id="lesson_name" name="lesson_name" placeholder="New Lesson"><br>
+        <input type="text" id="lesson_name" name="lesson_name" placeholder="Enter Lesson Name"><br>
     </form>
-    <button onclick="spawnQuestion()" class="button">Add Question</button> <!-- spawns a new question -->
-    <button onclick="submit()" class="button">Submit</button> <!-- submits the lesson -->
+    <button onclick="spawnQuestion()" class="button">Add Word</button> <!-- spawns a new question -->
+    <button onclick="submit()" class="button">Finish</button> <!-- submits the lesson -->
     <button onclick="back()" class="button" id="back">BACK</button> <!-- goes back to the class -->
 
     <script>

@@ -2,6 +2,10 @@ label {
     font-size: 2rem;
 }
 
+#lesson_name {
+    width: 17.5vw;
+}
+
 input {
     font: inherit;
     font-size: 2rem;
